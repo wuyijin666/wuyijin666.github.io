@@ -23,14 +23,14 @@
 <meta property="og:site_name" content="吴亦槿Coding">
 <meta property="og:description" content="ThreadLocal原理（源码分析） ThreadLocal的set方法：12345678910111213public void set(T value)&#123;    &#x2F;&#x2F;1.获取当前线程    Thread t &#x3D; Thread.currentThread();    &#x2F;&#x2F;2. 获取线程中的属性threadLocalMap,若threadLocalMap不为空，则直接更新要保存的变量值">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/source/images/3.png">
-<meta property="og:image" content="http://example.com/source/images/4.png">
+<meta property="og:image" content="http://example.com/images/3.png">
+<meta property="og:image" content="http://example.com/images/4.png">
 <meta property="article:published_time" content="2024-04-14T04:18:28.000Z">
-<meta property="article:modified_time" content="2024-04-14T12:52:18.593Z">
+<meta property="article:modified_time" content="2024-04-14T13:46:19.545Z">
 <meta property="article:author" content="yijin">
 <meta property="article:tag" content="浅谈Threadlocal（2）">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/source/images/3.png">
+<meta name="twitter:image" content="http://example.com/images/3.png">
   
   
   
@@ -328,7 +328,7 @@
 </ol>
 <p>所以如果 ThreadLocal 没有被外部强引用的情况下，在垃圾回收的时候会被清理掉的，这样一来 ThreadLocalMap中使用这个 ThreadLocal 的 key 也会被清理掉。但是，value 是强引用，不会被清理，这样一来就会出现 key 为 null 的 value。</p>
 <p>ThreadLocal其实是与线程绑定的一个变量，如此就会出现一个问题：如果没有将ThreadLocal内的变量删除（remove）或替换，它的生命周期将会与线程共存。通常线程池中对线程管理都是采用线程复用的方法，在线程池中线程很难结束甚至于永远不会结束，这将意味着线程持续的时间将不可预测，甚至与JVM的生命周期一致。举个例字，如果ThreadLocal中直接或间接包装了集合类或复杂对象，每次在同一个ThreadLocal中取出对象后，再对内容做操作，那么内部的集合类和复杂对象所占用的空间可能会开始持续膨胀。</p>
-<h4 id="ThreadLocal与Thread，ThreadLocalMap之间的关系"><a href="#ThreadLocal与Thread，ThreadLocalMap之间的关系" class="headerlink" title="ThreadLocal与Thread，ThreadLocalMap之间的关系"></a>ThreadLocal与Thread，ThreadLocalMap之间的关系</h4><p><img src="/source/images/3.png" srcset="/img/loading.gif" lazyload><br><img src="/source/images/4.png" srcset="/img/loading.gif" lazyload><br>从这个图中我们可以非常直观的看出，ThreadLocalMap其实是Thread线程的一个属性值，而ThreadLocal是维护ThreadLocalMap这个属性值的一个工具类。<mark>Thread线程可以拥有多个ThreadLocal维护的自己线程独享的共享变量</mark>（这个共享变量只是针对自己线程里面共享）</p>
+<h4 id="ThreadLocal与Thread，ThreadLocalMap之间的关系"><a href="#ThreadLocal与Thread，ThreadLocalMap之间的关系" class="headerlink" title="ThreadLocal与Thread，ThreadLocalMap之间的关系"></a>ThreadLocal与Thread，ThreadLocalMap之间的关系</h4><p><img src="/images/3.png" srcset="/img/loading.gif" lazyload><br><img src="/images/4.png" srcset="/img/loading.gif" lazyload><br>从这个图中我们可以非常直观的看出，ThreadLocalMap其实是Thread线程的一个属性值，而ThreadLocal是维护ThreadLocalMap这个属性值的一个工具类。<mark>Thread线程可以拥有多个ThreadLocal维护的自己线程独享的共享变量</mark>（这个共享变量只是针对自己线程里面共享）</p>
 
                 
               </div>
