@@ -16,22 +16,26 @@
   <meta name="author" content="yijin">
   <meta name="keywords" content="">
   
-    <meta name="description" content="ThreadLocal 常见使用场景">
+    <meta name="description" content="高效的内存数据结构 动态字符串动态字符串是一种能够动态扩展长度的字符串实现方式。SDS是Redis中的一种简单动态字符串结构，它是一种动态大小的字节数组，用于存储和操作字符串数据。 1234567891011&#x2F;* * redis中保存字符串对象的结构 *&#x2F;struct sdshdr &#123;    &#x2F;&#x2F;用于记录buf数组中使用的字节的数目，和SDS存储的字符串的长度相等     int len">
 <meta property="og:type" content="article">
-<meta property="og:title" content="ThreadLocal">
-<meta property="og:url" content="http://example.com/2024/04/14/ThreadLocal(3)/index.html">
+<meta property="og:title" content="浅谈Redis为何那么快（二）">
+<meta property="og:url" content="http://example.com/2024/04/15/%E6%B5%85%E8%B0%88Redis%E4%B8%BA%E4%BD%95%E9%82%A3%E4%B9%88%E5%BF%AB%EF%BC%88%E4%BA%8C%EF%BC%89/index.html">
 <meta property="og:site_name" content="吴亦槿Coding">
-<meta property="og:description" content="ThreadLocal 常见使用场景">
+<meta property="og:description" content="高效的内存数据结构 动态字符串动态字符串是一种能够动态扩展长度的字符串实现方式。SDS是Redis中的一种简单动态字符串结构，它是一种动态大小的字节数组，用于存储和操作字符串数据。 1234567891011&#x2F;* * redis中保存字符串对象的结构 *&#x2F;struct sdshdr &#123;    &#x2F;&#x2F;用于记录buf数组中使用的字节的数目，和SDS存储的字符串的长度相等     int len">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-04-14T12:50:28.000Z">
-<meta property="article:modified_time" content="2024-04-14T13:43:36.657Z">
+<meta property="og:image" content="http://example.com/images/7.png">
+<meta property="og:image" content="http://example.com/images/8.png">
+<meta property="og:image" content="http://example.com/images/9.png">
+<meta property="article:published_time" content="2024-04-15T07:35:59.000Z">
+<meta property="article:modified_time" content="2024-04-15T16:24:09.254Z">
 <meta property="article:author" content="yijin">
-<meta property="article:tag" content="浅谈Threadlocal（3）常见使用场景">
+<meta property="article:tag" content="本文探讨Redis之所以快速处理大规模数据的原因">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/images/7.png">
   
   
   
-  <title>ThreadLocal - 吴亦槿Coding</title>
+  <title>浅谈Redis为何那么快（二） - 吴亦槿Coding</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -226,7 +230,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="ThreadLocal"></span>
+            <span id="subtitle" data-typed-text="浅谈Redis为何那么快（二）"></span>
           
         </div>
 
@@ -237,8 +241,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-04-14 20:50" pubdate>
-          2024年4月14日 晚上
+        <time datetime="2024-04-15 15:35" pubdate>
+          2024年4月15日 下午
         </time>
       </span>
     
@@ -249,7 +253,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          7 字
+          1.1k 字
         
       </span>
     
@@ -260,7 +264,7 @@
         
         
         
-          1 分钟
+          10 分钟
         
       </span>
     
@@ -305,12 +309,32 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">ThreadLocal</h1>
+            <h1 id="seo-header">浅谈Redis为何那么快（二）</h1>
             
             
               <div class="markdown-body">
                 
-                <h3 id="ThreadLocal-常见使用场景"><a href="#ThreadLocal-常见使用场景" class="headerlink" title="ThreadLocal 常见使用场景"></a>ThreadLocal 常见使用场景</h3>
+                <h1 id="高效的内存数据结构"><a href="#高效的内存数据结构" class="headerlink" title="高效的内存数据结构"></a>高效的内存数据结构</h1><p><img src="/images/7.png" srcset="/img/loading.gif" lazyload></p>
+<h3 id="动态字符串"><a href="#动态字符串" class="headerlink" title="动态字符串"></a>动态字符串</h3><p>动态字符串是一种能够动态扩展长度的字符串实现方式。SDS是Redis中的一种简单动态字符串结构，它是一种动态大小的字节数组，用于存储和操作字符串数据。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/*</span><br><span class="hljs-comment"> * redis中保存字符串对象的结构</span><br><span class="hljs-comment"> */</span><br>struct sdshdr &#123;<br>    <span class="hljs-comment">//用于记录buf数组中使用的字节的数目，和SDS存储的字符串的长度相等 </span><br>    <span class="hljs-type">int</span> len;<br>    <span class="hljs-comment">//用于记录buf数组中没有使用的字节的数目 </span><br>    <span class="hljs-type">int</span> free;<br>    <span class="hljs-comment">//字节数组，用于储存字符串</span><br>    <span class="hljs-type">char</span> buf[]; <span class="hljs-comment">//buf的大小等于len+free+1，其中多余的1个字节是用来存储’\0’的</span><br>&#125;;<br></code></pre></td></tr></table></figure>
+<p>Redis的SDS的数据结构使用一个len字段记录当前字符串的长度，使用free表示空闲的长度。想要获取长度只需要获取len字段即可。<br><img src="/images/8.png" srcset="/img/loading.gif" lazyload><br>而对比C语言，传统字符串是使用长度为N+1的字符数组来表示长度为 的字符串，并且字符串数组的最后一个元素总是空字符’\0’。<br>SDS相对于C语言字符串有如下优点：</p>
+<ol>
+<li><strong>二进制安全</strong> :SDS可以存储任意二进制数据，而不仅仅是文本字符串(包括图片、视频、音频等在内的各种二进制数据)，而不会受到空字符或者特殊字符的限制，具有更广泛的适用性。</li>
+<li><strong>动态扩展</strong> : SDS可以根据存储的字符串长度动态调整，根据实际需要动态分配和释放内存空间。</li>
+<li><strong>O(1)时间复杂度</strong> </li>
+<li><strong>缓冲区溢出保护</strong> : SDS在存储字符串时，会自动添加一个空字符串（’\O’）作为字符串的结束标志，保证字符串的安全性和稳定性。</li>
+<li><strong>惰性空间释放</strong> : 当SDS缩短字符串时，并不会立即释放多余空间，多余空间会保存下来，以备后续再利用。这种惰性空间释放策略可以减少内存分配和释放的开销，提高内存利用率。</li>
+</ol>
+<h3 id="双端链表"><a href="#双端链表" class="headerlink" title="双端链表"></a>双端链表</h3><p>Redis中的双端链表是一种经过优化的数据结构，用于存储有序数据集合。它具有双向连接的特性，每个节点都包含前一个节点和后一个节点的指针。<br><img src="/images/9.png" srcset="/img/loading.gif" lazyload><br>在Redis中，双端链表节点的定义通常如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">listNode</span> &#123;</span><br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">listNode</span> *<span class="hljs-title">prev</span>;</span>  <span class="hljs-comment">// 指向前一个节点的指针</span><br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">listNode</span> *<span class="hljs-title">next</span>;</span>  <span class="hljs-comment">// 指向后一个节点的指针</span><br>    <span class="hljs-type">void</span> *value;            <span class="hljs-comment">// 存储的数据元素</span><br>&#125; listNode;<br></code></pre></td></tr></table></figure>
+<p>对于链表中描述链表整体属性的元数据，它的结构如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">list</span> &#123;</span><br>    listNode *head;  <span class="hljs-comment">// 头节点指针</span><br>    listNode *tail;  <span class="hljs-comment">// 尾节点指针</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> len;  <span class="hljs-comment">// 链表长度</span><br>    <span class="hljs-comment">// 其他字段...</span><br>&#125; <span class="hljs-built_in">list</span>;<br></code></pre></td></tr></table></figure>
+<ol>
+<li><strong>头结点</strong>（head node): 头结点是双端链表中的第一个节点，也是链表的入口。通常用于存储链表的起始位置信息，以便快速定位链表的起始位置。在双端链表中，头结点的特点是没有前一个节点，即头结点的 prev 为 NULL。头结点通常用于存储链表的头部元数据或者哨兵节点。</li>
+<li><strong>尾结点</strong> (tail node): 尾结点是双端链表中的第一个节点，也是链表的结束位置。通常用于存储链表的结束位置信息，以便快速定位链表的结束位置。在双端链表中，尾结点的特点是没有最后一个节点，即尾结点的 next 为 NULL。尾结点通常用于存储链表的尾部元数据或者哨兵节点。</li>
+</ol>
+<p>通过头节点和尾节点，可以方便地对双端链表进行头部插入、尾部插入、头部删除、尾部删除等操作，从而实现了对双端链表的高效操作。<br>除了上述头尾节点以外，链表的元数据中还有len参数，这个参数用于记录链表的当前长度。每当链表中添加或删除节点时，Redis会相应地更新len字段的值，以反映链表的当前长度。这个参数与SDS里类似，获取链表长度时不用再遍历整个链表，直接拿到len值就可以了，这个时间复杂度是 O(1)。</p>
+
                 
               </div>
             
@@ -328,7 +352,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8E%E5%B9%B6%E5%8F%91/" class="category-chain-item">多线程与并发</a>
+  <a href="/categories/redis/" class="category-chain-item">redis</a>
   
   
 
@@ -343,7 +367,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/%E6%B5%85%E8%B0%88Threadlocal%EF%BC%883%EF%BC%89%E5%B8%B8%E8%A7%81%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF/" class="print-no-link">#浅谈Threadlocal（3）常见使用场景</a>
+        <a href="/tags/%E6%9C%AC%E6%96%87%E6%8E%A2%E8%AE%A8Redis%E4%B9%8B%E6%89%80%E4%BB%A5%E5%BF%AB%E9%80%9F%E5%A4%84%E7%90%86%E5%A4%A7%E8%A7%84%E6%A8%A1%E6%95%B0%E6%8D%AE%E7%9A%84%E5%8E%9F%E5%9B%A0/" class="print-no-link">#本文探讨Redis之所以快速处理大规模数据的原因</a>
       
     </div>
   
@@ -355,8 +379,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>ThreadLocal</div>
-      <div>http://example.com/2024/04/14/ThreadLocal(3)/</div>
+      <div>浅谈Redis为何那么快（二）</div>
+      <div>http://example.com/2024/04/15/浅谈Redis为何那么快（二）/</div>
     </div>
     <div class="license-meta">
       
@@ -368,7 +392,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年4月14日</div>
+          <div>2024年4月15日</div>
         </div>
       
       
@@ -400,9 +424,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/04/15/%E8%8A%B1%E4%B8%80%E5%B9%B4%E8%AF%BB%E6%AF%9B%E9%80%89/" title="《论持久战》顶级战略思维">
+                      <a href="/2024/04/18/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8/" title="分析布隆过滤器解决缓存穿透问题">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">《论持久战》顶级战略思维</span>
+                        <span class="hidden-mobile">分析布隆过滤器解决缓存穿透问题</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -410,8 +434,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/04/14/ThreadLocal(2)/" title="浅谈Threadlocal（2）（源码分析）">
-                        <span class="hidden-mobile">浅谈Threadlocal（2）（源码分析）</span>
+                      <a href="/2024/04/15/%E8%8A%B1%E4%B8%80%E5%B9%B4%E8%AF%BB%E6%AF%9B%E9%80%89/" title="《论持久战》顶级战略思维">
+                        <span class="hidden-mobile">《论持久战》顶级战略思维</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

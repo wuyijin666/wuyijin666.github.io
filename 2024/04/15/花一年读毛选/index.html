@@ -16,22 +16,24 @@
   <meta name="author" content="yijin">
   <meta name="keywords" content="">
   
-    <meta name="description" content="ThreadLocal 常见使用场景">
+    <meta name="description" content="写作背景《论持久战》写于1938年，日军全面侵华刚开始，当时亡国论和速胜论等多方声音盘旋，这篇文章主要是给战争态势做一个分析与总结，并且牵引革命前行的一个演讲。 二维辩证法分析矩阵在这篇文章中，教员分析到 战争的胜利取决于三个方面：  中国抗日统一战线的完成 国际抗日统一战线的完成 日本国内人民和日本殖民地人民的革命运动的兴起就中国人民的立场来说，三个条件中，中国人民的大联合是主要的。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="ThreadLocal">
-<meta property="og:url" content="http://example.com/2024/04/14/ThreadLocal(3)/index.html">
+<meta property="og:title" content="《论持久战》顶级战略思维">
+<meta property="og:url" content="http://example.com/2024/04/15/%E8%8A%B1%E4%B8%80%E5%B9%B4%E8%AF%BB%E6%AF%9B%E9%80%89/index.html">
 <meta property="og:site_name" content="吴亦槿Coding">
-<meta property="og:description" content="ThreadLocal 常见使用场景">
+<meta property="og:description" content="写作背景《论持久战》写于1938年，日军全面侵华刚开始，当时亡国论和速胜论等多方声音盘旋，这篇文章主要是给战争态势做一个分析与总结，并且牵引革命前行的一个演讲。 二维辩证法分析矩阵在这篇文章中，教员分析到 战争的胜利取决于三个方面：  中国抗日统一战线的完成 国际抗日统一战线的完成 日本国内人民和日本殖民地人民的革命运动的兴起就中国人民的立场来说，三个条件中，中国人民的大联合是主要的。">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-04-14T12:50:28.000Z">
-<meta property="article:modified_time" content="2024-04-14T13:43:36.657Z">
+<meta property="og:image" content="http://example.com/images/5.png">
+<meta property="article:published_time" content="2024-04-15T04:25:00.000Z">
+<meta property="article:modified_time" content="2024-04-15T04:52:06.806Z">
 <meta property="article:author" content="yijin">
-<meta property="article:tag" content="浅谈Threadlocal（3）常见使用场景">
+<meta property="article:tag" content="详细读《论持久战》，关于辩证的矛盾分析、战略定力和长期主义">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/images/5.png">
   
   
   
-  <title>ThreadLocal - 吴亦槿Coding</title>
+  <title>《论持久战》顶级战略思维 - 吴亦槿Coding</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -226,7 +228,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="ThreadLocal"></span>
+            <span id="subtitle" data-typed-text="《论持久战》顶级战略思维"></span>
           
         </div>
 
@@ -237,8 +239,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-04-14 20:50" pubdate>
-          2024年4月14日 晚上
+        <time datetime="2024-04-15 12:25" pubdate>
+          2024年4月15日 中午
         </time>
       </span>
     
@@ -249,7 +251,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          7 字
+          173 字
         
       </span>
     
@@ -260,7 +262,7 @@
         
         
         
-          1 分钟
+          2 分钟
         
       </span>
     
@@ -305,12 +307,19 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">ThreadLocal</h1>
+            <h1 id="seo-header">《论持久战》顶级战略思维</h1>
             
             
               <div class="markdown-body">
                 
-                <h3 id="ThreadLocal-常见使用场景"><a href="#ThreadLocal-常见使用场景" class="headerlink" title="ThreadLocal 常见使用场景"></a>ThreadLocal 常见使用场景</h3>
+                <h3 id="写作背景"><a href="#写作背景" class="headerlink" title="写作背景"></a>写作背景</h3><p>《论持久战》写于1938年，日军全面侵华刚开始，当时亡国论和速胜论等多方声音盘旋，这篇文章主要是给战争态势做一个分析与总结，并且牵引革命前行的一个演讲。</p>
+<h3 id="二维辩证法分析矩阵"><a href="#二维辩证法分析矩阵" class="headerlink" title="二维辩证法分析矩阵"></a>二维辩证法分析矩阵</h3><p><img src="/images/6.png" srcset="/img/loading.gif" lazyload><br>在这篇文章中，教员分析到 战争的胜利取决于三个方面：</p>
+<ol>
+<li>中国抗日统一战线的完成</li>
+<li>国际抗日统一战线的完成</li>
+<li>日本国内人民和日本殖民地人民的革命运动的兴起<br>就中国人民的立场来说，三个条件中，中国人民的大联合是主要的。</li>
+</ol>
+
                 
               </div>
             
@@ -328,7 +337,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8E%E5%B9%B6%E5%8F%91/" class="category-chain-item">多线程与并发</a>
+  <a href="/categories/%E6%AF%9B%E9%80%89/" class="category-chain-item">毛选</a>
   
   
 
@@ -343,7 +352,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/%E6%B5%85%E8%B0%88Threadlocal%EF%BC%883%EF%BC%89%E5%B8%B8%E8%A7%81%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF/" class="print-no-link">#浅谈Threadlocal（3）常见使用场景</a>
+        <a href="/tags/%E8%AF%A6%E7%BB%86%E8%AF%BB%E3%80%8A%E8%AE%BA%E6%8C%81%E4%B9%85%E6%88%98%E3%80%8B%EF%BC%8C%E5%85%B3%E4%BA%8E%E8%BE%A9%E8%AF%81%E7%9A%84%E7%9F%9B%E7%9B%BE%E5%88%86%E6%9E%90%E3%80%81%E6%88%98%E7%95%A5%E5%AE%9A%E5%8A%9B%E5%92%8C%E9%95%BF%E6%9C%9F%E4%B8%BB%E4%B9%89/" class="print-no-link">#详细读《论持久战》，关于辩证的矛盾分析、战略定力和长期主义</a>
       
     </div>
   
@@ -355,8 +364,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>ThreadLocal</div>
-      <div>http://example.com/2024/04/14/ThreadLocal(3)/</div>
+      <div>《论持久战》顶级战略思维</div>
+      <div>http://example.com/2024/04/15/花一年读毛选/</div>
     </div>
     <div class="license-meta">
       
@@ -368,7 +377,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年4月14日</div>
+          <div>2024年4月15日</div>
         </div>
       
       
@@ -400,9 +409,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/04/15/%E8%8A%B1%E4%B8%80%E5%B9%B4%E8%AF%BB%E6%AF%9B%E9%80%89/" title="《论持久战》顶级战略思维">
+                      <a href="/2024/04/15/%E6%B5%85%E8%B0%88Redis%E4%B8%BA%E4%BD%95%E9%82%A3%E4%B9%88%E5%BF%AB%EF%BC%88%E4%BA%8C%EF%BC%89/" title="浅谈Redis为何那么快（二）">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">《论持久战》顶级战略思维</span>
+                        <span class="hidden-mobile">浅谈Redis为何那么快（二）</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -410,8 +419,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/04/14/ThreadLocal(2)/" title="浅谈Threadlocal（2）（源码分析）">
-                        <span class="hidden-mobile">浅谈Threadlocal（2）（源码分析）</span>
+                      <a href="/2024/04/14/ThreadLocal(3)/" title="ThreadLocal">
+                        <span class="hidden-mobile">ThreadLocal</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

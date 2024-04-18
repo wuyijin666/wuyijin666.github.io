@@ -255,6 +255,195 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2024/04/18/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8/" target="_self">
+          分析布隆过滤器解决缓存穿透问题
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/04/18/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8/" target="_self">
+        <div>
+          缓存穿透：由用户大量向缓存和数据库不存在数据发送恶意请求，从而绕过缓存，直接访问数据库，最终导致数据可崩溃。 如何在海量元素中（例如 10 亿无序、不定长、不重复）快速判断一个元素是否存在。 这个问题涉及两个关键点：海量数据、快速判断。 如果我们直接把这些元素的值放到基本的数据结构Set里面，会十分占用空间。 所以，我们存储这几十亿个元素，不能直接存值，我们应该找到一种最简单的最节省空间的数据结构
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-04-18 12:50" pubdate>
+              2024-04-18
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E7%BC%93%E5%AD%98/" class="category-chain-item">缓存</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%B5%B7%E9%87%8F%E6%95%B0%E6%8D%AE%E3%80%81%E5%BF%AB%E9%80%9F%E5%88%A4%E6%96%AD/">#海量数据、快速判断</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/04/15/%E6%B5%85%E8%B0%88Redis%E4%B8%BA%E4%BD%95%E9%82%A3%E4%B9%88%E5%BF%AB%EF%BC%88%E4%BA%8C%EF%BC%89/" target="_self">
+          浅谈Redis为何那么快（二）
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/04/15/%E6%B5%85%E8%B0%88Redis%E4%B8%BA%E4%BD%95%E9%82%A3%E4%B9%88%E5%BF%AB%EF%BC%88%E4%BA%8C%EF%BC%89/" target="_self">
+        <div>
+          高效的内存数据结构 动态字符串动态字符串是一种能够动态扩展长度的字符串实现方式。SDS是Redis中的一种简单动态字符串结构，它是一种动态大小的字节数组，用于存储和操作字符串数据。 1234567891011/* * redis中保存字符串对象的结构 */struct sdshdr &#123;    //用于记录buf数组中使用的字节的数目，和SDS存储的字符串的长度相等     int len
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-04-15 15:35" pubdate>
+              2024-04-15
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/redis/" class="category-chain-item">redis</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%9C%AC%E6%96%87%E6%8E%A2%E8%AE%A8Redis%E4%B9%8B%E6%89%80%E4%BB%A5%E5%BF%AB%E9%80%9F%E5%A4%84%E7%90%86%E5%A4%A7%E8%A7%84%E6%A8%A1%E6%95%B0%E6%8D%AE%E7%9A%84%E5%8E%9F%E5%9B%A0/">#本文探讨Redis之所以快速处理大规模数据的原因</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2024/04/15/%E8%8A%B1%E4%B8%80%E5%B9%B4%E8%AF%BB%E6%AF%9B%E9%80%89/" target="_self">
+          <img src="/images/5.png" srcset="/img/loading.gif" lazyload alt="《论持久战》顶级战略思维">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/04/15/%E8%8A%B1%E4%B8%80%E5%B9%B4%E8%AF%BB%E6%AF%9B%E9%80%89/" target="_self">
+          《论持久战》顶级战略思维
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt " href="/2024/04/15/%E8%8A%B1%E4%B8%80%E5%B9%B4%E8%AF%BB%E6%AF%9B%E9%80%89/" target="_self">
+        <div>
+          写作背景《论持久战》写于1938年，日军全面侵华刚开始，当时亡国论和速胜论等多方声音盘旋，这篇文章主要是给战争态势做一个分析与总结，并且牵引革命前行的一个演讲。 二维辩证法分析矩阵在这篇文章中，教员分析到 战争的胜利取决于三个方面：  中国抗日统一战线的完成 国际抗日统一战线的完成 日本国内人民和日本殖民地人民的革命运动的兴起就中国人民的立场来说，三个条件中，中国人民的大联合是主要的。
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-04-15 12:25" pubdate>
+              2024-04-15
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%AF%9B%E9%80%89/" class="category-chain-item">毛选</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E8%AF%A6%E7%BB%86%E8%AF%BB%E3%80%8A%E8%AE%BA%E6%8C%81%E4%B9%85%E6%88%98%E3%80%8B%EF%BC%8C%E5%85%B3%E4%BA%8E%E8%BE%A9%E8%AF%81%E7%9A%84%E7%9F%9B%E7%9B%BE%E5%88%86%E6%9E%90%E3%80%81%E6%88%98%E7%95%A5%E5%AE%9A%E5%8A%9B%E5%92%8C%E9%95%BF%E6%9C%9F%E4%B8%BB%E4%B9%89/">#详细读《论持久战》，关于辩证的矛盾分析、战略定力和长期主义</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2024/04/14/ThreadLocal(3)/" target="_self">
           ThreadLocal
         </a>
@@ -479,7 +668,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2024/03/29/%E6%B5%85%E8%B0%88Redis%E4%B8%BA%E4%BD%95%E9%82%A3%E4%B9%88%E5%BF%AB/" target="_self">
         <div>
-          我们从Redis基于内存操作的特性、高效的内存数据结构、单线程模型、I&#x2F;O多路复用技术、底层模型和优化技术、持久化机制以及网络通信协议等多个方面进行分析和讨论。通过深入了解Redis内部机制和性能优化技术，我们可以更好地理解Redis之所以快速地根本原因＋在实际应用中发挥其优势。 &#x3D;&#x3D;完全基于内存&#x3D;&#x3D;相较于依赖磁盘存储的传统数据库系统，Redis巧
+          我们从Redis基于内存操作的特性、高效的内存数据结构、单线程模型、I&#x2F;O多路复用技术、底层模型和优化技术、持久化机制以及网络通信协议等多个方面进行分析和讨论。通过深入了解Redis内部机制和性能优化技术，我们可以更好地理解Redis之所以快速地根本原因＋在实际应用中发挥其优势。 完全基于内存相较于依赖磁盘存储的传统数据库系统，Redis巧妙地运用内存的高速读写特性，显著提高系统的响应速
         </div>
       </a>
 
