@@ -16,22 +16,24 @@
   <meta name="author" content="yijin">
   <meta name="keywords" content="">
   
-    <meta name="description" content="ThreadLocal 常见使用场景">
+    <meta name="description" content="ThreadLocal 常见使用场景ThreadLocal作用在每一个线程内都需要独立的保存信息，这样就方便同一个线程的其他方法获取到该信息的场景，由于每一个线程获取到的信息可能都不一样，前面执行的方法保存了信息后，后续方法可以通过ThreadLocal直接获取到，避免了传参，类似于全局变量的概念。比如像用户登录令牌解密后的信息传递、用户权限信息、从用户系统中获取到的用户名。如上图，线程创建了变量">
 <meta property="og:type" content="article">
-<meta property="og:title" content="ThreadLocal">
+<meta property="og:title" content="ThreadLocal（3）常见使用场景">
 <meta property="og:url" content="http://example.com/2024/04/14/ThreadLocal(3)/index.html">
 <meta property="og:site_name" content="吴亦槿Coding">
-<meta property="og:description" content="ThreadLocal 常见使用场景">
+<meta property="og:description" content="ThreadLocal 常见使用场景ThreadLocal作用在每一个线程内都需要独立的保存信息，这样就方便同一个线程的其他方法获取到该信息的场景，由于每一个线程获取到的信息可能都不一样，前面执行的方法保存了信息后，后续方法可以通过ThreadLocal直接获取到，避免了传参，类似于全局变量的概念。比如像用户登录令牌解密后的信息传递、用户权限信息、从用户系统中获取到的用户名。如上图，线程创建了变量">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/images/15.png">
 <meta property="article:published_time" content="2024-04-14T12:50:28.000Z">
-<meta property="article:modified_time" content="2024-04-14T13:43:36.657Z">
+<meta property="article:modified_time" content="2024-04-18T16:21:19.562Z">
 <meta property="article:author" content="yijin">
 <meta property="article:tag" content="浅谈Threadlocal（3）常见使用场景">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/images/15.png">
   
   
   
-  <title>ThreadLocal - 吴亦槿Coding</title>
+  <title>ThreadLocal（3）常见使用场景 - 吴亦槿Coding</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -226,7 +228,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="ThreadLocal"></span>
+            <span id="subtitle" data-typed-text="ThreadLocal（3）常见使用场景"></span>
           
         </div>
 
@@ -249,7 +251,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          7 字
+          300 字
         
       </span>
     
@@ -260,7 +262,7 @@
         
         
         
-          1 分钟
+          3 分钟
         
       </span>
     
@@ -305,12 +307,22 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">ThreadLocal</h1>
+            <h1 id="seo-header">ThreadLocal（3）常见使用场景</h1>
             
             
               <div class="markdown-body">
                 
-                <h3 id="ThreadLocal-常见使用场景"><a href="#ThreadLocal-常见使用场景" class="headerlink" title="ThreadLocal 常见使用场景"></a>ThreadLocal 常见使用场景</h3>
+                <h3 id="ThreadLocal-常见使用场景"><a href="#ThreadLocal-常见使用场景" class="headerlink" title="ThreadLocal 常见使用场景"></a>ThreadLocal 常见使用场景</h3><p>ThreadLocal作用在每一个线程内都需要独立的保存信息，这样就方便同一个线程的其他方法获取到该信息的场景，由于每一个线程获取到的信息可能都不一样，前面执行的方法保存了信息后，后续方法可以通过ThreadLocal直接获取到，避免了传参，类似于全局变量的概念。比如像用户登录令牌解密后的信息传递、用户权限信息、从用户系统中获取到的用户名。<br><img src="/images/15.png" srcset="/img/loading.gif" lazyload><br>如上图，线程创建了变量A,方法二是跟方法一在同一个线程内，变量A在该线程中共享。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">//用户微服务配置token解密信息传递例子</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-title function_">ThreadLocal</span><span class="hljs-params">(LoginUser)</span> threadLocal = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ThreadLocal</span>&lt;&gt;();<br>     <span class="hljs-type">LoginUser</span> <span class="hljs-variable">loginUser</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">LoginUser</span>();<br>     loginUser.setId(id);<br>     loginUser.setName(name);<br>     loginUser.setMail(mail);<br>     loginUser.setHeadImg(headImg);<br>     threadLocal.set(loginUser);<br><br>后续想直接获取到，就threadLocal.getXXX即可<br></code></pre></td></tr></table></figure>
+<h3 id="如何用ThreadLocal实现线程安全的问题"><a href="#如何用ThreadLocal实现线程安全的问题" class="headerlink" title="如何用ThreadLocal实现线程安全的问题"></a>如何用ThreadLocal实现线程安全的问题</h3><p>ThreadLocal适用于如下两种场景：</p>
+<ol>
+<li>每个线程需要自己单独的实例</li>
+<li>实例需要在多个方法中共享，但不希望被多线程共享</li>
+</ol>
+<h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><ol>
+<li>存储用户Session</li>
+</ol>
+
                 
               </div>
             
@@ -355,7 +367,7 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>ThreadLocal</div>
+      <div>ThreadLocal（3）常见使用场景</div>
       <div>http://example.com/2024/04/14/ThreadLocal(3)/</div>
     </div>
     <div class="license-meta">
