@@ -16,24 +16,24 @@
   <meta name="author" content="yijin">
   <meta name="keywords" content="">
   
-    <meta name="description" content="记录第一天学习go, 附上第一句话：“Hello World!” 我被Gopher可爱到了，地鼠啊哈哈哈，怎么会有这么戳我蠢萌点的吉祥物啊，越看越想笑。开GO!">
+    <meta name="description" content="IO多路复用之epoll的原理与使用 + Reactor模型解析epoll原理：使用： go这里，更多采用net + Goroutine来实现类Reactor模型的Echo Server，底层自动使用epoll(Linux)简单看个epoll echo server 的实现 12345678910111213141516171819202122232425262728293031323334353">
 <meta property="og:type" content="article">
-<meta property="og:title" content="第一天Go (日记纪念版)">
-<meta property="og:url" content="http://example.com/2024/04/27/%E7%AC%AC%E4%B8%80%E5%A4%A9Go/index.html">
+<meta property="og:title" content="Linux高性能服务器编程读书笔记（二）">
+<meta property="og:url" content="http://example.com/2025/11/19/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%8C%EF%BC%89/index.html">
 <meta property="og:site_name" content="吴亦槿Coding">
-<meta property="og:description" content="记录第一天学习go, 附上第一句话：“Hello World!” 我被Gopher可爱到了，地鼠啊哈哈哈，怎么会有这么戳我蠢萌点的吉祥物啊，越看越想笑。开GO!">
+<meta property="og:description" content="IO多路复用之epoll的原理与使用 + Reactor模型解析epoll原理：使用： go这里，更多采用net + Goroutine来实现类Reactor模型的Echo Server，底层自动使用epoll(Linux)简单看个epoll echo server 的实现 12345678910111213141516171819202122232425262728293031323334353">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/images/16.png">
-<meta property="article:published_time" content="2024-04-27T03:00:00.000Z">
-<meta property="article:modified_time" content="2024-04-27T03:27:21.368Z">
+<meta property="article:published_time" content="2025-11-19T15:35:59.000Z">
+<meta property="article:modified_time" content="2025-11-19T15:49:39.190Z">
 <meta property="article:author" content="yijin">
-<meta property="article:tag" content="用Go实战IM即时消息系统">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="服务器编程">
+<meta property="article:tag" content="网络编程">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/images/16.png">
   
   
   
-  <title>第一天Go (日记纪念版) - 吴亦槿Coding</title>
+  <title>Linux高性能服务器编程读书笔记（二） - 吴亦槿Coding</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -228,7 +228,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="第一天Go (日记纪念版)"></span>
+            <span id="subtitle" data-typed-text="Linux高性能服务器编程读书笔记（二）"></span>
           
         </div>
 
@@ -239,8 +239,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-04-27 11:00" pubdate>
-          2024年4月27日 上午
+        <time datetime="2025-11-19 23:35" pubdate>
+          2025年11月19日 晚上
         </time>
       </span>
     
@@ -251,7 +251,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          51 字
+          205 字
         
       </span>
     
@@ -262,7 +262,7 @@
         
         
         
-          1 分钟
+          2 分钟
         
       </span>
     
@@ -307,13 +307,22 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">第一天Go (日记纪念版)</h1>
+            <h1 id="seo-header">Linux高性能服务器编程读书笔记（二）</h1>
             
             
               <div class="markdown-body">
                 
-                <p>记录第一天学习go, 附上第一句话：“Hello World!”<br><img src="/images/17.png" srcset="/img/loading.gif" lazyload></p>
-<p>我被Gopher可爱到了，地鼠啊哈哈哈，怎么会有这么戳我蠢萌点的吉祥物啊，越看越想笑。开GO!</p>
+                <h2 id="IO多路复用之epoll的原理与使用-Reactor模型解析"><a href="#IO多路复用之epoll的原理与使用-Reactor模型解析" class="headerlink" title="IO多路复用之epoll的原理与使用 + Reactor模型解析"></a>IO多路复用之epoll的原理与使用 + Reactor模型解析</h2><h3 id="epoll原理："><a href="#epoll原理：" class="headerlink" title="epoll原理："></a>epoll原理：</h3><p>使用：</p>
+<p>go这里，更多采用net + Goroutine来实现类Reactor模型的Echo Server，底层自动使用epoll(Linux)<br>简单看个epoll echo server 的实现</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><code class="hljs go"><br><span class="hljs-keyword">var</span> wg sync.WaitGroup<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">handleConn</span><span class="hljs-params">(c net.Conn)</span></span> &#123;<br>    <span class="hljs-keyword">defer</span> c.Close()<br>    <span class="hljs-keyword">defer</span> wg.Done()<br><br>    reader := bufio.NewReader(c)<br>    <span class="hljs-keyword">for</span> &#123;<br>        message, err := reader.ReadString(<span class="hljs-string">&#x27;\n&#x27;</span>)<br>        <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>            <span class="hljs-comment">//客户端断开连接</span><br>            log.Printf(<span class="hljs-string">&quot;client %s disconnected&quot;</span>, c.RemoteAddr())<br>            <span class="hljs-keyword">return</span><br>        &#125;<br>        log.Printf(<span class="hljs-string">&quot;Received from %s: %q&quot;</span>, c.RemoteAddr(), message)<br>        <span class="hljs-comment">// Echo back to client</span><br>        err := c.Write([]<span class="hljs-type">byte</span>(message))<br>        <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>            <span class="hljs-keyword">return</span><br>        &#125;<br>    &#125;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123; <br>    listen, err := net.Listen(<span class="hljs-string">&quot;tcp&quot;</span>, <span class="hljs-string">&quot;:8080&quot;</span>)<br>    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>        log.Fatal(<span class="hljs-string">&quot;Listen failed:&quot;</span>, err)<br>    &#125;<br>    <span class="hljs-keyword">defer</span> listen.Close()<br><br>    <span class="hljs-keyword">for</span>&#123;<br>        conn, err := listen.Accept()<br>        <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>           log.Fatal(<span class="hljs-string">&quot;Accept failed:&quot;</span>, err)<br>           <span class="hljs-keyword">continue</span><br>        &#125;<br>        log.Printf(<span class="hljs-string">&quot;New client connected: %s&quot;</span>, conn.RemoteAddr())<br><br>        wg.Add(<span class="hljs-number">1</span>)<br>        <span class="hljs-keyword">go</span> handleConn(conn)<br><br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+<p>TODO 有空会去分析下go runtime库下的netpoll，对linux epoll的封装</p>
+<h3 id="select-poll-epoll-对比"><a href="#select-poll-epoll-对比" class="headerlink" title="select poll epoll 对比"></a>select poll epoll 对比</h3><ol>
+<li>LT vs ET</li>
+<li>为何ET用非阻塞socket</li>
+</ol>
+<h3 id="Reactor模型思想："><a href="#Reactor模型思想：" class="headerlink" title="Reactor模型思想："></a>Reactor模型思想：</h3><p>Reactor 事件驱动<br>Proactor </p>
 
                 
               </div>
@@ -332,8 +341,15 @@
     
       <span class="category-chain">
         
-  <a href="/categories/GO/" class="category-chain-item">GO</a>
+  <a href="/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" class="category-chain-item">读书笔记</a>
   
+  
+    <span>></span>
+    
+  <a href="/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%BC%96%E7%A8%8B/" class="category-chain-item">Linux高性能服务器编程</a>
+  
+  
+
   
 
       </span>
@@ -347,7 +363,11 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/%E7%94%A8Go%E5%AE%9E%E6%88%98IM%E5%8D%B3%E6%97%B6%E6%B6%88%E6%81%AF%E7%B3%BB%E7%BB%9F/" class="print-no-link">#用Go实战IM即时消息系统</a>
+        <a href="/tags/Linux/" class="print-no-link">#Linux</a>
+      
+        <a href="/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%BC%96%E7%A8%8B/" class="print-no-link">#服务器编程</a>
+      
+        <a href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" class="print-no-link">#网络编程</a>
       
     </div>
   
@@ -359,8 +379,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>第一天Go (日记纪念版)</div>
-      <div>http://example.com/2024/04/27/第一天Go/</div>
+      <div>Linux高性能服务器编程读书笔记（二）</div>
+      <div>http://example.com/2025/11/19/Linux高性能服务器编程读书笔记（二）/</div>
     </div>
     <div class="license-meta">
       
@@ -372,7 +392,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年4月27日</div>
+          <div>2025年11月19日</div>
         </div>
       
       
@@ -404,18 +424,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/11/15/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/" title="Linux高性能服务器编程读书笔记（一）">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Linux高性能服务器编程读书笔记（一）</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/04/19/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84/" title="微服务架构">
-                        <span class="hidden-mobile">微服务架构</span>
+                      <a href="/2025/11/19/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%89%EF%BC%89/" title="Linux高性能服务器编程读书笔记（三）">
+                        <span class="hidden-mobile">Linux高性能服务器编程读书笔记（三）</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

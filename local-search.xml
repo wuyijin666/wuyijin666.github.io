@@ -4,6 +4,130 @@
   
   
   <entry>
+    <title>Linux高性能服务器编程读书笔记（二）</title>
+    <link href="/2025/11/19/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%8C%EF%BC%89/"/>
+    <url>/2025/11/19/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%8C%EF%BC%89/</url>
+    
+    <content type="html"><![CDATA[<h2 id="IO多路复用之epoll的原理与使用-Reactor模型解析"><a href="#IO多路复用之epoll的原理与使用-Reactor模型解析" class="headerlink" title="IO多路复用之epoll的原理与使用 + Reactor模型解析"></a>IO多路复用之epoll的原理与使用 + Reactor模型解析</h2><h3 id="epoll原理："><a href="#epoll原理：" class="headerlink" title="epoll原理："></a>epoll原理：</h3><p>使用：</p><p>go这里，更多采用net + Goroutine来实现类Reactor模型的Echo Server，底层自动使用epoll(Linux)<br>简单看个epoll echo server 的实现</p><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><code class="hljs go"><br><span class="hljs-keyword">var</span> wg sync.WaitGroup<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">handleConn</span><span class="hljs-params">(c net.Conn)</span></span> &#123;<br>    <span class="hljs-keyword">defer</span> c.Close()<br>    <span class="hljs-keyword">defer</span> wg.Done()<br><br>    reader := bufio.NewReader(c)<br>    <span class="hljs-keyword">for</span> &#123;<br>        message, err := reader.ReadString(<span class="hljs-string">&#x27;\n&#x27;</span>)<br>        <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>            <span class="hljs-comment">//客户端断开连接</span><br>            log.Printf(<span class="hljs-string">&quot;client %s disconnected&quot;</span>, c.RemoteAddr())<br>            <span class="hljs-keyword">return</span><br>        &#125;<br>        log.Printf(<span class="hljs-string">&quot;Received from %s: %q&quot;</span>, c.RemoteAddr(), message)<br>        <span class="hljs-comment">// Echo back to client</span><br>        err := c.Write([]<span class="hljs-type">byte</span>(message))<br>        <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>            <span class="hljs-keyword">return</span><br>        &#125;<br>    &#125;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123; <br>    listen, err := net.Listen(<span class="hljs-string">&quot;tcp&quot;</span>, <span class="hljs-string">&quot;:8080&quot;</span>)<br>    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>        log.Fatal(<span class="hljs-string">&quot;Listen failed:&quot;</span>, err)<br>    &#125;<br>    <span class="hljs-keyword">defer</span> listen.Close()<br><br>    <span class="hljs-keyword">for</span>&#123;<br>        conn, err := listen.Accept()<br>        <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>           log.Fatal(<span class="hljs-string">&quot;Accept failed:&quot;</span>, err)<br>           <span class="hljs-keyword">continue</span><br>        &#125;<br>        log.Printf(<span class="hljs-string">&quot;New client connected: %s&quot;</span>, conn.RemoteAddr())<br><br>        wg.Add(<span class="hljs-number">1</span>)<br>        <span class="hljs-keyword">go</span> handleConn(conn)<br><br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure><p>TODO 有空会去分析下go runtime库下的netpoll，对linux epoll的封装</p><h3 id="select-poll-epoll-对比"><a href="#select-poll-epoll-对比" class="headerlink" title="select poll epoll 对比"></a>select poll epoll 对比</h3><ol><li>LT vs ET</li><li>为何ET用非阻塞socket</li></ol><h3 id="Reactor模型思想："><a href="#Reactor模型思想：" class="headerlink" title="Reactor模型思想："></a>Reactor模型思想：</h3><p>Reactor 事件驱动<br>Proactor </p>]]></content>
+    
+    
+    <categories>
+      
+      <category>读书笔记</category>
+      
+      <category>Linux高性能服务器编程</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Linux</tag>
+      
+      <tag>服务器编程</tag>
+      
+      <tag>网络编程</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Linux高性能服务器编程读书笔记（三）</title>
+    <link href="/2025/11/19/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%89%EF%BC%89/"/>
+    <url>/2025/11/19/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%89%EF%BC%89/</url>
+    
+    <content type="html"><![CDATA[<h3 id="如何避免惊群问题？-SO-REUSEPORT"><a href="#如何避免惊群问题？-SO-REUSEPORT" class="headerlink" title="如何避免惊群问题？(SO_REUSEPORT)"></a>如何避免惊群问题？(SO_REUSEPORT)</h3>]]></content>
+    
+    
+    <categories>
+      
+      <category>读书笔记</category>
+      
+      <category>Linux高性能服务器编程</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Linux</tag>
+      
+      <tag>服务器编程</tag>
+      
+      <tag>网络编程</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Linux高性能服务器编程读书笔记（四）</title>
+    <link href="/2025/11/19/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%EF%BC%88%E5%9B%9B%EF%BC%89/"/>
+    <url>/2025/11/19/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%EF%BC%88%E5%9B%9B%EF%BC%89/</url>
+    
+    <content type="html"><![CDATA[<h3 id="TIME-WAIT问题，以及如何优化-解决？"><a href="#TIME-WAIT问题，以及如何优化-解决？" class="headerlink" title="TIME_WAIT问题，以及如何优化&#x2F;解决？"></a>TIME_WAIT问题，以及如何优化&#x2F;解决？</h3>]]></content>
+    
+    
+    <categories>
+      
+      <category>读书笔记</category>
+      
+      <category>Linux高性能服务器编程</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Linux</tag>
+      
+      <tag>服务器编程</tag>
+      
+      <tag>网络编程</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Linux高性能服务器编程读书笔记（一）</title>
+    <link href="/2025/11/15/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/"/>
+    <url>/2025/11/15/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/</url>
+    
+    <content type="html"><![CDATA[<h2 id="笔记目录-（TCP-IP协议详解）"><a href="#笔记目录-（TCP-IP协议详解）" class="headerlink" title="笔记目录 （TCP&#x2F;IP协议详解）"></a>笔记目录 （TCP&#x2F;IP协议详解）</h2><p>引言： 我尽量把书中看到的知识点和最近在网络上看到的一些技术文章做一些记录，一是对这部分知识更全面、体系化的思考，二是记录一些不错的知识点，分享给大家，建议大家还是自己亲自读一读。</p><ol><li>TCP&#x2F;IP协议族</li><li>IP协议详解</li><li>TCP协议详解</li></ol><h2 id="TCP-IP协议族"><a href="#TCP-IP协议族" class="headerlink" title="TCP&#x2F;IP协议族"></a>TCP&#x2F;IP协议族</h2><h2 id="IP协议详解"><a href="#IP协议详解" class="headerlink" title="IP协议详解"></a>IP协议详解</h2><h2 id="TCP协议详解"><a href="#TCP协议详解" class="headerlink" title="TCP协议详解"></a>TCP协议详解</h2><p>TCP协议理解概述</p><ol><li>TCP头部信息（用于指定源端口、目标端口、管理TCP链接、控制两个方向的数据流）</li><li>TCP状态转移过程（TCP连接的任意一端都是一个状态机）</li><li>Tcp数据流以及对数据流的控制</li></ol><p>TCP服务特点</p><ol><li>通信双方都必须为该连接分配必要的内核资源，以便管理连接的状态和连接上的数据流传输</li><li>一对一连接，因此比起UDP，TCP还有一个特点是不适用基于广播&#x2F;多播（目标是多个主机地址）的应用程序（这个点，我在被常规八股中，还从来没见到有谁总结过）</li><li>思考 数据包 or 字节流 到底在说什么？<br>回答：当接收端收到一个或多个TCP报文段后，TCP模块将他们携带的应用程序数据按照TCP报文段的顺序依次放入TCP接收缓冲区中并通知应用程序读取数据；应用程序这边，可以一次读完，也可分次去读，取决于用户指定的应用程序读缓冲区的大小。应用程序的读次数和TCP模块接收到的TCP报文段个数无关。</li></ol><p>现在我来回答<strong>字节流</strong>的概念：发送端执行的写操作次数和接收端执行的读操作次数之间没有任何数量关系，这就是字节流的概念。应用程序对数据的发送和接收无边界限制。UDP则不然。发送端应用程序每执行一次写操作，UDP模块就会封装一个UDP报文段并发送。接收端必须及时接收（执行读操作，通过recvfrom系统调用），不然，就丢包。并且，如果用户指定的应用程序读缓冲区大小不够，UDP报文也会被截断。<br>来个栩栩如生的好图：<br><img src="/images/22.jpg"><br>TCP 的可靠：确认应答机制 + 开了个定时器</p><p>以及今天看了Julia Evans这篇文章《Why do we use the Linux kernel’s TCP stack?》<br>如果你想用自实现的用户态TCP堆栈，是在追求什么？<br>A： </p><ol><li>极致性能：<br>避免内核上下文切换、系统调用和内存拷贝。<br>可完全控制网络处理逻辑，减少锁竞争和共享状态（符合“端到端原则”）。</li><li>灵活性与快速迭代：<br>内核更新慢，难以支持新协议特性（如 TCP Fast Open）。Google 就因无法强制 Android 厂商升级内核，而更倾向用户态实现。</li></ol><p>目前流行不起来的原因何在？<br>A:</p><ol><li>内核 TCP 栈是“默认且合理”的选择，因其成熟、通用、省心。</li><li>用户态网络栈适用于极端性能或特殊需求场景（如追求极致性能的交易、超大规模负载均衡）。</li><li>势是“将网络处理推向用户态”，以减少内核干预，提升可扩展性与灵活性。</li><li>社区正在探索通用化用户态网络方案（如 LKL、libuinet），但尚未成熟。</li></ol><p>📌 补充背景<br>Cloudflare 工程师 Marek Majkowski 在其文章《Why we use the Linux kernel’s TCP stack》直接回应了 Julia Evans 博客的问题，强调了工程实践中“稳健性”和“长期可维护性”往往比理论峰值性能更重要。Cloudflare 的立场代表了许多大型生产系统的务实选择。</p><p>正如 Marek 所说：</p><p>“We are not in the business of writing TCP stacks. We are in the business of securing and accelerating the web.”</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>读书笔记</category>
+      
+      <category>Linux高性能服务器编程</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Linux</tag>
+      
+      <tag>服务器编程</tag>
+      
+      <tag>网络编程</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>第一天Go (日记纪念版)</title>
     <link href="/2024/04/27/%E7%AC%AC%E4%B8%80%E5%A4%A9Go/"/>
     <url>/2024/04/27/%E7%AC%AC%E4%B8%80%E5%A4%A9Go/</url>
@@ -204,19 +328,6 @@
   
   
   <entry>
-    <title>Hello World</title>
-    <link href="/2024/04/13/hello-world/"/>
-    <url>/2024/04/13/hello-world/</url>
-    
-    <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p><h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo new <span class="hljs-string">&quot;My New Post&quot;</span><br></code></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p><h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo server<br></code></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p><h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo generate<br></code></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p><h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo deploy<br></code></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>]]></content>
-    
-    
-    
-  </entry>
-  
-  
-  
-  <entry>
     <title>浅谈Redis为何那么快（一）</title>
     <link href="/2024/03/29/%E6%B5%85%E8%B0%88Redis%E4%B8%BA%E4%BD%95%E9%82%A3%E4%B9%88%E5%BF%AB/"/>
     <url>/2024/03/29/%E6%B5%85%E8%B0%88Redis%E4%B8%BA%E4%BD%95%E9%82%A3%E4%B9%88%E5%BF%AB/</url>
@@ -236,6 +347,19 @@
       <tag>本文探讨Redis之所以快速处理大规模数据的原因</tag>
       
     </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Hello World</title>
+    <link href="/1970/01/01/hello-world/"/>
+    <url>/1970/01/01/hello-world/</url>
+    
+    <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p><h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo new <span class="hljs-string">&quot;My New Post&quot;</span><br></code></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p><h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo server<br></code></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p><h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo generate<br></code></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p><h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo deploy<br></code></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>]]></content>
+    
+    
     
   </entry>
   
