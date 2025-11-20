@@ -256,14 +256,14 @@
       <h2 class="index-header">
         
         <a href="/2025/11/19/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%8C%EF%BC%89/" target="_self">
-          Linux高性能服务器编程读书笔记（二）
+          IO多路复用之epoll的原理与使用 + Reactor模型解析
         </a>
       </h2>
 
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/11/19/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%8C%EF%BC%89/" target="_self">
         <div>
-          IO多路复用之epoll的原理与使用 + Reactor模型解析epoll原理：使用： go这里，更多采用net + Goroutine来实现类Reactor模型的Echo Server，底层自动使用epoll(Linux)简单看个epoll echo server 的实现 12345678910111213141516171819202122232425262728293031323334353
+          IO多路复用之epoll的原理与使用 + Reactor模型解析IO复用：在复用什么？IO复用使得程序可以同时监听多个文件描述符，复用的是线程&#x2F;进程，而非连接本身。让一个线程（进）同时监听成百上千个网络连接（文件描述符），只在某个连接真正可读&#x2F;可写时，才处理该连接。 IO复用使用场景 客户端程序同时处理多个socket(非阻塞connect技术) 客户端程序同时处理用户输入与网
         </div>
       </a>
 
@@ -328,7 +328,7 @@
       <h2 class="index-header">
         
         <a href="/2025/11/19/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%89%EF%BC%89/" target="_self">
-          Linux高性能服务器编程读书笔记（三）
+          如何避免惊群问题？(SO_REUSEPORT)
         </a>
       </h2>
 
@@ -400,7 +400,7 @@
       <h2 class="index-header">
         
         <a href="/2025/11/19/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%EF%BC%88%E5%9B%9B%EF%BC%89/" target="_self">
-          Linux高性能服务器编程读书笔记（四）
+          TIME_WAIT问题，以及如何优化/解决？
         </a>
       </h2>
 
@@ -408,6 +408,78 @@
       <a class="index-excerpt index-excerpt__noimg" href="/2025/11/19/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%EF%BC%88%E5%9B%9B%EF%BC%89/" target="_self">
         <div>
           TIME_WAIT问题，以及如何优化&#x2F;解决？
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-11-19 23:35" pubdate>
+              2025-11-19
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" class="category-chain-item">读书笔记</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%BC%96%E7%A8%8B/" class="category-chain-item">Linux高性能服务器编程</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Linux/">#Linux</a>
+            
+              <a href="/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%BC%96%E7%A8%8B/">#服务器编程</a>
+            
+              <a href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/">#网络编程</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2025/11/19/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%94%EF%BC%89/" target="_self">
+          多线程/进程协作方式
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/11/19/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%94%EF%BC%89/" target="_self">
+        <div>
+          
         </div>
       </a>
 
@@ -847,67 +919,6 @@
             <i class="iconfont icon-tags"></i>
             
               <a href="/tags/%E8%AF%A6%E7%BB%86%E8%AF%BB%E3%80%8A%E8%AE%BA%E6%8C%81%E4%B9%85%E6%88%98%E3%80%8B%EF%BC%8C%E5%85%B3%E4%BA%8E%E8%BE%A9%E8%AF%81%E7%9A%84%E7%9F%9B%E7%9B%BE%E5%88%86%E6%9E%90%E3%80%81%E6%88%98%E7%95%A5%E5%AE%9A%E5%8A%9B%E5%92%8C%E9%95%BF%E6%9C%9F%E4%B8%BB%E4%B9%89/">#详细读《论持久战》，关于辩证的矛盾分析、战略定力和长期主义</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/04/14/ThreadLocal(3)/" target="_self">
-          ThreadLocal（3）常见使用场景
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/04/14/ThreadLocal(3)/" target="_self">
-        <div>
-          ThreadLocal 常见使用场景ThreadLocal作用在每一个线程内都需要独立的保存信息，这样就方便同一个线程的其他方法获取到该信息的场景，由于每一个线程获取到的信息可能都不一样，前面执行的方法保存了信息后，后续方法可以通过ThreadLocal直接获取到，避免了传参，类似于全局变量的概念。比如像用户登录令牌解密后的信息传递、用户权限信息、从用户系统中获取到的用户名。如上图，线程创建了变量
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-04-14 20:50" pubdate>
-              2024-04-14
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8E%E5%B9%B6%E5%8F%91/" class="category-chain-item">多线程与并发</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E6%B5%85%E8%B0%88Threadlocal%EF%BC%883%EF%BC%89%E5%B8%B8%E8%A7%81%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF/">#浅谈Threadlocal（3）常见使用场景</a>
             
           </div>
         
