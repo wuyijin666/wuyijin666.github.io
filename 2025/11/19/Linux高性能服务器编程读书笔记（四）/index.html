@@ -16,20 +16,23 @@
   <meta name="author" content="yijin">
   <meta name="keywords" content="">
   
-    <meta name="description" content="TIME_WAIT问题，以及如何优化&#x2F;解决？">
+    <meta name="description" content="TIME_WAIT问题，以及如何优化&#x2F;解决？何时出现TIME_WAIT从上图可以看到，在客户端收到服务端发过来的报文段6后，客户端进入TIME_WAIT状态，这个状态的持续时间为2MSL。TIME_WAIT存在的原因有以下两点：  可靠地终止TCP连接 保证让迟来地TCP报文段有足够地时间被识别并丢弃（或者说 避免历史报文被新的连接接收 ）  TIME_WAIT持续时间2MSL ，MSL">
 <meta property="og:type" content="article">
 <meta property="og:title" content="TIME_WAIT问题，以及如何优化&#x2F;解决？">
 <meta property="og:url" content="http://example.com/2025/11/19/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%EF%BC%88%E5%9B%9B%EF%BC%89/index.html">
 <meta property="og:site_name" content="吴亦槿Coding">
-<meta property="og:description" content="TIME_WAIT问题，以及如何优化&#x2F;解决？">
+<meta property="og:description" content="TIME_WAIT问题，以及如何优化&#x2F;解决？何时出现TIME_WAIT从上图可以看到，在客户端收到服务端发过来的报文段6后，客户端进入TIME_WAIT状态，这个状态的持续时间为2MSL。TIME_WAIT存在的原因有以下两点：  可靠地终止TCP连接 保证让迟来地TCP报文段有足够地时间被识别并丢弃（或者说 避免历史报文被新的连接接收 ）  TIME_WAIT持续时间2MSL ，MSL">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/images/24.jpg">
+<meta property="og:image" content="http://example.com/images/25.jpg">
 <meta property="article:published_time" content="2025-11-19T15:35:59.000Z">
-<meta property="article:modified_time" content="2025-11-20T01:40:51.877Z">
+<meta property="article:modified_time" content="2025-11-23T02:26:36.767Z">
 <meta property="article:author" content="yijin">
 <meta property="article:tag" content="Linux">
 <meta property="article:tag" content="服务器编程">
 <meta property="article:tag" content="网络编程">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/images/24.jpg">
   
   
   
@@ -251,7 +254,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          12 字
+          434 字
         
       </span>
     
@@ -262,7 +265,7 @@
         
         
         
-          1 分钟
+          4 分钟
         
       </span>
     
@@ -312,7 +315,23 @@
             
               <div class="markdown-body">
                 
-                <h3 id="TIME-WAIT问题，以及如何优化-解决？"><a href="#TIME-WAIT问题，以及如何优化-解决？" class="headerlink" title="TIME_WAIT问题，以及如何优化&#x2F;解决？"></a>TIME_WAIT问题，以及如何优化&#x2F;解决？</h3>
+                <h3 id="TIME-WAIT问题，以及如何优化-解决？"><a href="#TIME-WAIT问题，以及如何优化-解决？" class="headerlink" title="TIME_WAIT问题，以及如何优化&#x2F;解决？"></a>TIME_WAIT问题，以及如何优化&#x2F;解决？</h3><h4 id="何时出现TIME-WAIT"><a href="#何时出现TIME-WAIT" class="headerlink" title="何时出现TIME_WAIT"></a>何时出现TIME_WAIT</h4><p><img src="/images/24.jpg" srcset="/img/loading.gif" lazyload><br>从上图可以看到，在客户端收到服务端发过来的报文段6后，客户端进入TIME_WAIT状态，这个状态的持续时间为2MSL。<br>TIME_WAIT存在的原因有以下两点：</p>
+<ul>
+<li>可靠地终止TCP连接</li>
+<li>保证让迟来地TCP报文段有足够地时间被识别并丢弃（或者说 避免历史报文被新的连接接收 ）</li>
+</ul>
+<h4 id="TIME-WAIT持续时间"><a href="#TIME-WAIT持续时间" class="headerlink" title="TIME_WAIT持续时间"></a>TIME_WAIT持续时间</h4><p>2MSL ，MSL表示最大 segments lifetime ，即TCP报文段最大的生命期。<br>坚持2MSL时间，是为了保证网络两个传输方向上尚未被接收到、迟到地tcp报文段都已经消失（被中转路由器丢弃）。</p>
+<h4 id="如何解决（避免）TIME-WAIT"><a href="#如何解决（避免）TIME-WAIT" class="headerlink" title="如何解决（避免）TIME_WAIT"></a>如何解决（避免）TIME_WAIT</h4><p><img src="/images/25.jpg" srcset="/img/loading.gif" lazyload><br>使用netstat查看连接状态，可以看到，客户端程序被中断后，连接进入TIME_WAIT状态，12345端口被占用，所以客户端重启失败。</p>
+<ul>
+<li>事实是，这个例子是我们指定了端口，所以重启失败。客户端程序不用担心这个问题。<strong>因为客户端一般使用系统自动分配的临时端口号来建立连接，而由于随机性</strong>，临时端口号一般和上次使用的端口号不同，所以一般客户端可以重启成功。</li>
+<li>针对于服务器程序，因为它总是使用同一个知名服务端口号，所以连接的TIME_WAIT状态将导致它不能立即重启。解决方案：通过socket选项SO_REUSEADDR，允许端口复用。(强制进程立即使用处于TIME_WAIT状态的连接占用的端口)</li>
+<li>总结： <ol>
+<li>客户端程序断连接</li>
+<li>服务端断，通过socket选项SO_REUSEADDR，允许端口复用</li>
+</ol>
+</li>
+</ul>
+
                 
               </div>
             
