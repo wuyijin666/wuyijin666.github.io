@@ -16,25 +16,24 @@
   <meta name="author" content="yijin">
   <meta name="keywords" content="">
   
-    <meta name="description" content="在看这本书时，我同时看了《黑天鹅》（讲述人类本能忽视沉默的证据，习惯事后总结，过于刻意讨论因果，这是一种经验性错误。）、《灰犀牛》（风险）两本书，《英伟达之道》就是很传统的企业传记，描述公司的成立、发展、岌岌可危与稳步向前等等。其实每个卓越的企业，都有不凡的故事。我看的是英伟达的企业文化以及它的CEO黄仁勋的领导风格。  黄仁勋对任何工作量不如自己的人都缺乏同情心，他也不认为自己因为全心投入英伟达">
+    <meta name="description" content="这是一份技术文档，详细介绍了OpenAI内部如何使用Codex模型来提升工程效率文章连接：https:&#x2F;&#x2F;cdn.openai.com&#x2F;pdf&#x2F;6a2631dc-783e-479b-b1a4-af0cfbd38630&#x2F;how-openai-uses-codex.pdf内部工作人员分享，重点（＋prompt使用优化）  代码理解  尝试使用以下示例提示来进行代码理解：   这个代码库中的认证逻辑是在">
 <meta property="og:type" content="article">
-<meta property="og:title" content="《英伟达之道》">
-<meta property="og:url" content="http://example.com/2025/12/29/%E8%AF%BB%E3%80%8A%E8%8B%B1%E4%BC%9F%E8%BE%BE%E4%B9%8B%E9%81%93%E3%80%8B/index.html">
+<meta property="og:title" content="week1 - How OpenAI Uses Codex">
+<meta property="og:url" content="http://example.com/2026/01/21/CS146S%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.html">
 <meta property="og:site_name" content="吴亦槿Coding">
-<meta property="og:description" content="在看这本书时，我同时看了《黑天鹅》（讲述人类本能忽视沉默的证据，习惯事后总结，过于刻意讨论因果，这是一种经验性错误。）、《灰犀牛》（风险）两本书，《英伟达之道》就是很传统的企业传记，描述公司的成立、发展、岌岌可危与稳步向前等等。其实每个卓越的企业，都有不凡的故事。我看的是英伟达的企业文化以及它的CEO黄仁勋的领导风格。  黄仁勋对任何工作量不如自己的人都缺乏同情心，他也不认为自己因为全心投入英伟达">
+<meta property="og:description" content="这是一份技术文档，详细介绍了OpenAI内部如何使用Codex模型来提升工程效率文章连接：https:&#x2F;&#x2F;cdn.openai.com&#x2F;pdf&#x2F;6a2631dc-783e-479b-b1a4-af0cfbd38630&#x2F;how-openai-uses-codex.pdf内部工作人员分享，重点（＋prompt使用优化）  代码理解  尝试使用以下示例提示来进行代码理解：   这个代码库中的认证逻辑是在">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/images/28.jpg">
-<meta property="article:published_time" content="2025-12-29T07:35:59.000Z">
-<meta property="article:modified_time" content="2026-01-01T03:32:13.207Z">
+<meta property="article:published_time" content="2026-01-21T02:07:51.752Z">
+<meta property="article:modified_time" content="2026-01-21T02:21:28.012Z">
 <meta property="article:author" content="yijin">
-<meta property="article:tag" content="读后感">
-<meta property="article:tag" content="复盘">
+<meta property="article:tag" content="ai">
+<meta property="article:tag" content="CS146S">
+<meta property="article:tag" content="prompt">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/images/28.jpg">
   
   
   
-  <title>《英伟达之道》 - 吴亦槿Coding</title>
+  <title>week1 - How OpenAI Uses Codex - 吴亦槿Coding</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -229,7 +228,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="黄仁勋和他的科技帝国"></span>
+            <span id="subtitle" data-typed-text="week1 - How OpenAI Uses Codex"></span>
           
         </div>
 
@@ -240,8 +239,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-12-29 15:35" pubdate>
-          2025年12月29日 下午
+        <time datetime="2026-01-21 10:07" pubdate>
+          2026年1月21日 上午
         </time>
       </span>
     
@@ -252,7 +251,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          863 字
+          744 字
         
       </span>
     
@@ -263,7 +262,7 @@
         
         
         
-          8 分钟
+          7 分钟
         
       </span>
     
@@ -308,21 +307,88 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">黄仁勋和他的科技帝国</h1>
+            <h1 id="seo-header">week1 - How OpenAI Uses Codex</h1>
             
             
               <div class="markdown-body">
                 
-                <p>在看这本书时，我同时看了《黑天鹅》（讲述人类本能忽视沉默的证据，习惯事后总结，过于刻意讨论因果，这是一种经验性错误。）、《灰犀牛》（风险）两本书，《英伟达之道》就是很传统的企业传记，描述公司的成立、发展、岌岌可危与稳步向前等等。其实每个卓越的企业，都有不凡的故事。我看的是英伟达的企业文化以及它的CEO黄仁勋的领导风格。</p>
+                <p>这是一份技术文档，详细介绍了OpenAI内部如何使用Codex模型来提升工程效率<br>文章连接：<a target="_blank" rel="noopener" href="https://cdn.openai.com/pdf/6a2631dc-783e-479b-b1a4-af0cfbd38630/how-openai-uses-codex.pdf">https://cdn.openai.com/pdf/6a2631dc-783e-479b-b1a4-af0cfbd38630/how-openai-uses-codex.pdf</a><br>内部工作人员分享，重点（＋prompt使用优化）</p>
+<ol>
+<li>代码理解<br>  尝试使用以下示例提示来进行代码理解：</li>
+</ol>
 <ul>
-<li>黄仁勋对任何工作量不如自己的人都缺乏同情心，他也不认为自己因为全心投入英伟达而错过了生活中的任何东西。对于自己的完美主义，他没有反驳，并表示同意。<br>“本该如此。如果你想做非凡的事情，那就不会轻松。”</li>
-<li>黄仁勋工程背景的最纯粹体现是他看似无限的工作精力。在他看来，在商业中，职业道德比智力更重要。“你有多聪明并不重要，因为总会有人比你更聪明。”在一个全球化的世界，“你的竞争对手不会睡觉。”</li>
-<li>“没有什么事情会被搁置。也没有什么事情会继续恶化。你必须做出回应，并推动这些事情向前发展。”人力资源前主管约翰麦克所里说道。</li>
-<li>表扬有时候是一种干扰，最致命的错误就是回顾过去的成就，仿佛它们能保护你免受未来的威胁。<br>(ps ： 这句话，其实结合我的2025一年的经历，是非常有感悟的。 有时候，通过过去的阶段性胜利来幻想未来自己也能一如既往的顺利，从而放弃奔跑，是一种近乎自杀的行为。不要分不清自信与自负的区别。)</li>
-<li>GPU横空出世：英伟达营销团队不顾工程师的反对，坚持使用GPU这一名称。“我们不需要任何人批准。”维沃利认为，行业外没人真的关心技术定义。此外，“我们知道下一代产品将是可编程的。我们决定冒险，将其夸大为GPU。”同时，维沃利决定不注册“GPU”商标，因为他希望其它公司也能用这个术语，意在表明英伟达开创了一个全新的产品类别。最终，”夸大”变为现实：GPU这一名称后来成为行业标准，并帮助英伟达在接下来的几十年里销售了数亿张显卡。<br>维达利对GPU的发布还提出了另一个想法：主动威慑竞争对手。英伟达的一名销售人员在一条通往3dfx总部的高速路的立交桥上设立了一个广告横幅，以宣传GeForce 256。该横幅宣称，英伟达的GPU将改变世界并击垮竞争对手。洲警迅速移除了这个非法设立的横幅，英伟达也因此收到了正式警告。但，这一举动确实达到了目的。”这就是战争的艺术。我们想让他们失去士气。”维达利说。英伟达正在逐步学习如何让对手屈服于自己的意志。</li>
-<li>黄仁勋的原则之一：就是要赢。我们的理念是，谁能跑得更快，谁就能占领更多的市场。</li>
-<li></li>
+<li><p>这个代码库中的认证逻辑是在哪里实现的？</p>
+</li>
+<li><p>总结请求从入口点到响应的过程中是如何流经这个服务的。</p>
+</li>
+<li><p>哪些模块与 [插入模块名称] 交互？故障是如何处理的？</p>
+</li>
 </ul>
+<ol start="2">
+<li>重构与迁移<br>  尝试使用以下示例提示来进行重构与迁移：</li>
+</ol>
+<ul>
+<li><p>按功能将这个文件拆分成独立的模块，并为每个模块生成测试。</p>
+</li>
+<li><p>将所有基于回调的数据库访问转换为 async&#x2F;await 模式。</p>
+</li>
+</ul>
+<ol start="3">
+<li>性能优化<br> 尝试使用以下示例提示来进行性能优化：</li>
+</ol>
+<ul>
+<li><p>优化这个循环以提高内存效率，并解释为什么你的版本更快。</p>
+</li>
+<li><p>在这个请求处理程序中找出重复的昂贵操作，并提出缓存机会。</p>
+</li>
+<li><p>为此函数中的批量数据库查询建议一种更快的方法。</p>
+</li>
+</ul>
+<ol start="4">
+<li>提高测试覆盖率<br>尝试使用以下示例提示来提高测试覆盖率：</li>
+</ol>
+<ul>
+<li><p>为这个函数编写单元测试，包括边界情况和失败路径。</p>
+</li>
+<li><p>为这个排序工具生成一个基于属性的测试。</p>
+</li>
+<li><p>扩展这个测试文件，以覆盖关于空输入和无效状态的缺失场景。</p>
+</li>
+</ul>
+<ol start="5">
+<li>提升开发速度<br>尝试使用以下示例提示来提升开发速度：</li>
+</ol>
+<ul>
+<li><p>为 POST &#x2F;events 新建一个 API 路由，包含基本验证和日志记录。</p>
+</li>
+<li><p>使用此模板 [插入你的遥测代码示例] 生成一个遥测钩子，用于跟踪新用户引导流程的成功&#x2F;失败。</p>
+</li>
+<li><p>根据此规范创建存根实现：[插入规范或产品反馈]。</p>
+</li>
+</ul>
+<ol start="6">
+<li>保持工作流连续性<br>尝试使用以下示例提示来保持工作流连续性：</li>
+</ol>
+<ul>
+<li><p>生成一个计划来重构此服务，并将其拆分为更小的模块。</p>
+</li>
+<li><p>创建重试逻辑的存根，并添加一个待办事项——我稍后再填写退避逻辑。</p>
+</li>
+<li><p>总结这个文件的内容，以便我明天可以接着上次的进度继续。</p>
+</li>
+</ul>
+<ol start="7">
+<li>探索与构思<br>尝试使用以下示例提示来进行探索与构思：</li>
+</ol>
+<ul>
+<li><p>如果系统是事件驱动而不是请求&#x2F;响应模式，这将如何工作？</p>
+</li>
+<li><p>找出所有手动构建 SQL 字符串而不是使用我们查询构建器的模块。</p>
+</li>
+<li><p>以更函数式的风格重写此代码，避免变异和副作用。</p>
+</li>
+</ul>
+<p>总结：工程师们探索出更为严谨清晰的prompt值得学习，同时，使用codex的习惯可参看原文进行培养。</p>
 
                 
               </div>
@@ -341,15 +407,8 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" class="category-chain-item">读书笔记</a>
+  <a href="/categories/ai%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="category-chain-item">ai学习笔记</a>
   
-  
-    <span>></span>
-    
-  <a href="/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E5%90%8E%E8%AE%B0/" class="category-chain-item">后记</a>
-  
-  
-
   
 
       </span>
@@ -363,9 +422,11 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/%E8%AF%BB%E5%90%8E%E6%84%9F/" class="print-no-link">#读后感</a>
+        <a href="/tags/ai/" class="print-no-link">#ai</a>
       
-        <a href="/tags/%E5%A4%8D%E7%9B%98/" class="print-no-link">#复盘</a>
+        <a href="/tags/CS146S/" class="print-no-link">#CS146S</a>
+      
+        <a href="/tags/prompt/" class="print-no-link">#prompt</a>
       
     </div>
   
@@ -377,8 +438,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>《英伟达之道》</div>
-      <div>http://example.com/2025/12/29/读《英伟达之道》/</div>
+      <div>week1 - How OpenAI Uses Codex</div>
+      <div>http://example.com/2026/01/21/CS146S学习笔记/</div>
     </div>
     <div class="license-meta">
       
@@ -390,7 +451,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2025年12月29日</div>
+          <div>2026年1月21日</div>
         </div>
       
       
@@ -422,9 +483,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2026/01/21/CS146S%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" title="week1 - How OpenAI Uses Codex">
+                      <a href="/2026/04/10/%E6%BA%90%E7%A0%81%E6%B3%84%E9%9C%B2%E5%90%8E%EF%BC%8C%E6%88%91%E6%89%92%E5%85%89%E4%BA%86Claude%20Code%E7%9A%84%E4%B8%8A%E4%B8%8B%E6%96%87%E5%8E%8B%E7%BC%A9%E6%9C%BA%E5%88%B6/" title="源码泄露后，我扒光了Claude Code的上下文压缩机制">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">week1 - How OpenAI Uses Codex</span>
+                        <span class="hidden-mobile">源码泄露后，我扒光了Claude Code的上下文压缩机制</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -432,8 +493,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/11/19/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%BC%96%E7%A8%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%8C%EF%BC%89/" title="IO多路复用之epoll的原理与使用 + Reactor模型解析">
-                        <span class="hidden-mobile">IO多路复用之epoll的原理与使用 + Reactor模型解析</span>
+                      <a href="/2025/12/29/%E8%AF%BB%E3%80%8A%E8%8B%B1%E4%BC%9F%E8%BE%BE%E4%B9%8B%E9%81%93%E3%80%8B/" title="《英伟达之道》">
+                        <span class="hidden-mobile">《英伟达之道》</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

@@ -4,11 +4,67 @@
   
   
   <entry>
+    <title>源码泄露后，我扒光了Claude Code的上下文压缩机制</title>
+    <link href="/2026/04/10/%E6%BA%90%E7%A0%81%E6%B3%84%E9%9C%B2%E5%90%8E%EF%BC%8C%E6%88%91%E6%89%92%E5%85%89%E4%BA%86Claude%20Code%E7%9A%84%E4%B8%8A%E4%B8%8B%E6%96%87%E5%8E%8B%E7%BC%A9%E6%9C%BA%E5%88%B6/"/>
+    <url>/2026/04/10/%E6%BA%90%E7%A0%81%E6%B3%84%E9%9C%B2%E5%90%8E%EF%BC%8C%E6%88%91%E6%89%92%E5%85%89%E4%BA%86Claude%20Code%E7%9A%84%E4%B8%8A%E4%B8%8B%E6%96%87%E5%8E%8B%E7%BC%A9%E6%9C%BA%E5%88%B6/</url>
+    
+    <content type="html"><![CDATA[<h3 id="源码泄露后，我扒光了Claude-Code的上下文压缩机制"><a href="#源码泄露后，我扒光了Claude-Code的上下文压缩机制" class="headerlink" title="源码泄露后，我扒光了Claude Code的上下文压缩机制"></a>源码泄露后，我扒光了Claude Code的上下文压缩机制</h3><h5 id="文章摘要：一个真正在实际生产环境中承载数百万次对话的LLM应用，它到底是如何处理上下文窗口这个最根本的限制的？这是一份难得的工程参考"><a href="#文章摘要：一个真正在实际生产环境中承载数百万次对话的LLM应用，它到底是如何处理上下文窗口这个最根本的限制的？这是一份难得的工程参考" class="headerlink" title="文章摘要：一个真正在实际生产环境中承载数百万次对话的LLM应用，它到底是如何处理上下文窗口这个最根本的限制的？这是一份难得的工程参考"></a>文章摘要：一个真正在实际生产环境中承载数百万次对话的LLM应用，它到底是如何处理上下文窗口这个最根本的限制的？这是一份难得的工程参考</h5><h3 id="一、-背景"><a href="#一、-背景" class="headerlink" title="一、 背景"></a>一、 背景</h3><p>模型的上下文窗口是整个系统中最宝贵的资源。以Claude Sonnet 4.6为例，其上下文窗口约200k tokens,但一次完整开发流程（代码阅读 、 多轮对话、错误调试）很容易超出这个限制。<br>如果不加管理，token上限，API会返回413 prompt_too_long , 对话被迫中断。cc为此设计了一套多层次、优先级明确的压缩体系。</p><ul><li>理解这套体系的关键。先理解一个核心参数 ： <strong>有效上下文窗口（Effective Context Window）</strong><br><img src="/../images/29.jpg"></li></ul><p>“有效窗口” &#x3D; 模型原始上下文窗口 - 20,000（为摘要输出预留）。这20,000 token的预留基于生产数据的p99.99统计值（压缩摘要输出的最大值为17,387tokens）</p><h3 id="二、cc的四种策略全景"><a href="#二、cc的四种策略全景" class="headerlink" title="二、cc的四种策略全景"></a>二、cc的四种策略全景</h3><p><img src="/../images/30.jpg"></p><ul><li>四种策略按触发时机和代价排序<br><img src="/../images/31.png"></li></ul><h3 id="三、浅析上下文压缩方案"><a href="#三、浅析上下文压缩方案" class="headerlink" title="三、浅析上下文压缩方案"></a>三、浅析上下文压缩方案</h3><h4 id="3-1-Auto压缩：主动防线"><a href="#3-1-Auto压缩：主动防线" class="headerlink" title="3.1 Auto压缩：主动防线"></a>3.1 Auto压缩：主动防线</h4><h5 id="3-1-1-触发阈值"><a href="#3-1-1-触发阈值" class="headerlink" title="3.1.1 触发阈值"></a>3.1.1 触发阈值</h5><p>token数超过以下阈值将触发Auto压缩:<br><code>Auto触发阈值 = 有效上下文窗口 - 13，000（AUTOCOMPACT_BUFFER_TOKENS）</code><br>预留13.000是为了确保压缩任务本身（发送历史+接收摘要）有足够空间<br><img src="/../images/32.png"></p><ul><li>Manual压缩的buffer只有3，000，原因在于manual时用户已经知道问题，无需额外安全余量</li></ul><h5 id="3-1-2-执行优先级"><a href="#3-1-2-执行优先级" class="headerlink" title="3.1.2 执行优先级"></a>3.1.2 执行优先级</h5><p>Auto压缩并非直接发起LLM调用，而是遵循以下优先级：<br><img src="/../images/33.png"><br><strong>熔断机制是生产数据驱动的设计决策</strong>：<br><img src="/../images/34.png"><br>    - 每日25万次无效api调用</p><h5 id="3-1-3-与其他策略互斥"><a href="#3-1-3-与其他策略互斥" class="headerlink" title="3.1.3 与其他策略互斥"></a>3.1.3 与其他策略互斥</h5><p>Reactive Compact 和 Context Collapse模式开启时，Auto压缩会主动退让<br><img src="/../images/35.png"></p><h4 id="3-2-Reactive压缩：被动防线"><a href="#3-2-Reactive压缩：被动防线" class="headerlink" title="3.2 Reactive压缩：被动防线"></a>3.2 Reactive压缩：被动防线</h4><p>Reactive压缩是Auto的反面 – 不主动判断token数，而是让api返回413错误才行动<br><img src="/../images/36.png"><br>扣押（withhold）机制使得用户完全感知不到这次413–用户体感是一次透明的压缩后重试<br>防止死循环：hasAttemptedReactiveCompact 标志确保Reactive每次query只尝试一次<br><img src="/../images/37.png"></p><h4 id="3-3-Snip：零成本的历史消息裁剪"><a href="#3-3-Snip：零成本的历史消息裁剪" class="headerlink" title="3.3 Snip：零成本的历史消息裁剪"></a>3.3 Snip：零成本的历史消息裁剪</h4><p>Snip是最‘轻量’的压缩策略:<strong>不调用LLM，直接删除历史记录</strong><br>它在query循环的最前端运行，比Microcompact更早，释放的token数会被传递给Auto进行阈值计算：<br><img src="/../images/38.png"><br>snipTokensFreed需要手动传递， 因为tokenCountWithEstimation()无法看到Snip释放的token – 它读取的是存活assistant消息的历史usage数值，该数值反映的是Snip之前的上下文大小</p><h4 id="3-4-LLM级压缩：Prompt设计解析"><a href="#3-4-LLM级压缩：Prompt设计解析" class="headerlink" title="3.4 LLM级压缩：Prompt设计解析"></a>3.4 LLM级压缩：Prompt设计解析</h4><ul><li>当需要LLM生成摘要时（Auto&#x2F;Manual&#x2F;Reactive的LLM路径），prompt的设计直接决定了压缩质量。</li></ul><h5 id="3-4-1-防工具调用前言（NO-TOOLS-PREAMBLE）"><a href="#3-4-1-防工具调用前言（NO-TOOLS-PREAMBLE）" class="headerlink" title="3.4.1 防工具调用前言（NO_TOOLS_PREAMBLE）"></a>3.4.1 防工具调用前言（NO_TOOLS_PREAMBLE）</h5><p>这是prompt.ts中最微妙的设计，源于真实生产问题：<br><img src="/../images/39.png"><br>2.79%对于压缩来说是很高的失败率，因为压缩失败意味着用户看到上下文中断问题。</p><h5 id="3-4-2-三种压缩模板"><a href="#3-4-2-三种压缩模板" class="headerlink" title="3.4.2 三种压缩模板"></a>3.4.2 三种压缩模板</h5><p>根绝压缩场景，使用不同的摘要模板：<br><img src="/../images/40.png"><br>‘from’方向保留前半段（旧消息），可以命中prompt cache；<br>‘up_to’方向保留后半段（新消息），但会破坏cache，因为prefix已被破坏</p><h5 id="3-4-3-摘要的结构设计"><a href="#3-4-3-摘要的结构设计" class="headerlink" title="3.4.3 摘要的结构设计"></a>3.4.3 摘要的结构设计</h5><p>BASE_COMPACT_PROMPT要求LLM产出9个部分的摘要：<br><img src="/../images/41.png"><br>6：‘All user messages’要求不截断地保留所有用户消息–防止任务漂移（模型遗忘用户真实意图）地关键设计<br>9：‘Optional next step’要求直接引用最近对话，而不是归纳，同样是为了防止漂移</p><h5 id="3-4-4-输出后处理"><a href="#3-4-4-输出后处理" class="headerlink" title="3.4.4 输出后处理"></a>3.4.4 输出后处理</h5><p><img src="/../images/42.png"><br><strong>analysis</strong>区块是LLM的思考草稿–在模型输出前先输出草稿，整理清楚思路，但并不展示在后续上下文中</p><h4 id="3-5-Session-Memory压缩：无LLM的最优路径"><a href="#3-5-Session-Memory压缩：无LLM的最优路径" class="headerlink" title="3.5 Session Memory压缩：无LLM的最优路径"></a>3.5 Session Memory压缩：无LLM的最优路径</h4><p>当Session Memory已初始时，Auto优先走Session Memory路径：<br><img src="/../images/43.png"><br>这条路径的优势是：无需给api请求，无需等待LLM响应，压缩几乎即时。<br>确定‘保留哪些消息’时，不能简单按token数截断—必须保证api调用的合法性：<br><img src="/../images/44.png"><br>Anthropic API对消息历史有严格约束：tool_use 和 tool_result必须配对出现，thinking blocks不能被拆散。这两个步骤确保压缩后的消息历史始终是合法的API请求</p><h4 id="3-6-Microcompact-Prompt-Cache感知的工具结果清理"><a href="#3-6-Microcompact-Prompt-Cache感知的工具结果清理" class="headerlink" title="3.6 Microcompact: Prompt Cache感知的工具结果清理"></a>3.6 Microcompact: Prompt Cache感知的工具结果清理</h4><p>Microcompact不是‘大压缩’，它的目标更精准：<strong>删除那些已经过时、占用空间大的工具调用结果</strong><br><img src="/../images/45.png"><br>cachedMicrocompactPath()使用Anthropic API的cache_edits功能，在不改变 cache key（即不破坏prompt cache）的前提下删除历史工具结果– 相当精妙的设计（在不拆墙的前提下悄悄搬走墙里的东西）。<br>）</p><h3 id="四、策略优先级总结"><a href="#四、策略优先级总结" class="headerlink" title="四、策略优先级总结"></a>四、策略优先级总结</h3><ul><li>先用廉价，再用昂贵<ol><li>最优：无LLM策略（Snip&#x2F;Microcompact&#x2F;Session Memory）,零延迟，零额外API成本</li><li>次优：Auto主动压缩，需一次api调用但完全透明</li><li>最后：Reactive压缩，在主动防线失败时兜底</li></ol></li></ul><p>压缩完成时，历史消息被替换为一条特殊的摘要消息，前面加上边界标记：<br><img src="/../images/46.png"><br>摘要以一条包装消息的形式注入，开头声明‘this session is being continued from a previous conversation’,让模型知道上下文被压缩过，避免它因为‘记忆缺失’产生疑惑</p><h3 id="五、总结"><a href="#五、总结" class="headerlink" title="五、总结"></a>五、总结</h3><p>六种相互协同的策略、精密的触发阈值设计、专门对抗模型‘工具调用冲动’的Prompt工程、以及将LLM摘要调用频率降至最低的Session Memory机制。<br>我们从4个问题出发：<strong>何时压缩</strong>（触发策略）、<strong>如何压缩</strong>（LLM Prompt设计）、<strong>压缩什么</strong>（信息保留优先级）、<strong>如何验证压缩没丢失关键上下文</strong>。<br>读完本文，你将理解为什么一个‘把对话缩短’的功能，在工程上实现会如此复杂–以及这些设计决策背后真正的工程代价。</p><h3 id="六、六旬老人也能看懂的总结："><a href="#六、六旬老人也能看懂的总结：" class="headerlink" title="六、六旬老人也能看懂的总结："></a>六、六旬老人也能看懂的总结：</h3><p>您想象一下，Claude Code 就像是一个记性有限的小助手，它脑子里能装的东西有个上限——大概能装 200 页纸的内容。</p><ul><li><p>问题出在哪儿呢？<br>您跟它聊天、让它改代码、调试程序，说着说着，它脑子就装不下了。就像您去菜市场买菜，拎的袋子满了，再买就拎不动了，得把一些不重要的东西先放一放。</p></li><li><p>它是怎么”省地方”的？<br>这篇文章讲了 6 种”省地方”的办法，我给您说说：</p></li></ul><ol><li><p>直接扔掉旧话（Snip）—— 把最早说的几句话删掉，不费脑子，立马腾地方</p></li><li><p>清理过期工具结果（Microcompact）—— 比如它之前帮您查过什么文件，查完了就不用老记着，删掉</p></li><li><p>主动总结（Auto）—— 快满的时候，它自己把之前的对话总结成一小段，就像把厚书缩成薄薄几页</p></li><li><p>被动总结（Reactive）—— 真装不下了，系统报错，它赶紧总结一遍再重试</p></li><li><p>手动总结（Manual）—— 您主动说”咱把之前的总结一下”</p></li><li><p>用现成的笔记（Session Memory）—— 如果之前已经记过笔记了，直接拿出来用，最省事儿</p></li></ol><p>最妙的地方<br>这系统有个特别聪明的设计：先试不花钱的办法，实在不行再花钱。就像您过日子，能省则省，真到没办法了再掏腰包。</p><p>而且它总结的时候，会先把您的所有原话都保留下来，怕忘了您最初想干啥——这就像您出门前写的购物清单，怕逛着逛着忘了要买啥。</p><ul><li>简单说：这就是一个 AI 助手为了不”脑子爆掉”，想出来的各种省地方的招儿，跟咱们过日子收拾屋子一个道理——该扔的扔，该总结的总结，实在不行再重新整理！🍮</li></ul>]]></content>
+    
+    
+    <categories>
+      
+      <category>Agent/AI</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>AI</tag>
+      
+      <tag>Agent</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>week1 - How OpenAI Uses Codex</title>
+    <link href="/2026/01/21/CS146S%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    <url>/2026/01/21/CS146S%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</url>
+    
+    <content type="html"><![CDATA[<p>这是一份技术文档，详细介绍了OpenAI内部如何使用Codex模型来提升工程效率<br>文章连接：<a href="https://cdn.openai.com/pdf/6a2631dc-783e-479b-b1a4-af0cfbd38630/how-openai-uses-codex.pdf">https://cdn.openai.com/pdf/6a2631dc-783e-479b-b1a4-af0cfbd38630/how-openai-uses-codex.pdf</a><br>内部工作人员分享，重点（＋prompt使用优化）</p><ol><li>代码理解<br>  尝试使用以下示例提示来进行代码理解：</li></ol><ul><li><p>这个代码库中的认证逻辑是在哪里实现的？</p></li><li><p>总结请求从入口点到响应的过程中是如何流经这个服务的。</p></li><li><p>哪些模块与 [插入模块名称] 交互？故障是如何处理的？</p></li></ul><ol start="2"><li>重构与迁移<br>  尝试使用以下示例提示来进行重构与迁移：</li></ol><ul><li><p>按功能将这个文件拆分成独立的模块，并为每个模块生成测试。</p></li><li><p>将所有基于回调的数据库访问转换为 async&#x2F;await 模式。</p></li></ul><ol start="3"><li>性能优化<br> 尝试使用以下示例提示来进行性能优化：</li></ol><ul><li><p>优化这个循环以提高内存效率，并解释为什么你的版本更快。</p></li><li><p>在这个请求处理程序中找出重复的昂贵操作，并提出缓存机会。</p></li><li><p>为此函数中的批量数据库查询建议一种更快的方法。</p></li></ul><ol start="4"><li>提高测试覆盖率<br>尝试使用以下示例提示来提高测试覆盖率：</li></ol><ul><li><p>为这个函数编写单元测试，包括边界情况和失败路径。</p></li><li><p>为这个排序工具生成一个基于属性的测试。</p></li><li><p>扩展这个测试文件，以覆盖关于空输入和无效状态的缺失场景。</p></li></ul><ol start="5"><li>提升开发速度<br>尝试使用以下示例提示来提升开发速度：</li></ol><ul><li><p>为 POST &#x2F;events 新建一个 API 路由，包含基本验证和日志记录。</p></li><li><p>使用此模板 [插入你的遥测代码示例] 生成一个遥测钩子，用于跟踪新用户引导流程的成功&#x2F;失败。</p></li><li><p>根据此规范创建存根实现：[插入规范或产品反馈]。</p></li></ul><ol start="6"><li>保持工作流连续性<br>尝试使用以下示例提示来保持工作流连续性：</li></ol><ul><li><p>生成一个计划来重构此服务，并将其拆分为更小的模块。</p></li><li><p>创建重试逻辑的存根，并添加一个待办事项——我稍后再填写退避逻辑。</p></li><li><p>总结这个文件的内容，以便我明天可以接着上次的进度继续。</p></li></ul><ol start="7"><li>探索与构思<br>尝试使用以下示例提示来进行探索与构思：</li></ol><ul><li><p>如果系统是事件驱动而不是请求&#x2F;响应模式，这将如何工作？</p></li><li><p>找出所有手动构建 SQL 字符串而不是使用我们查询构建器的模块。</p></li><li><p>以更函数式的风格重写此代码，避免变异和副作用。</p></li></ul><p>总结：工程师们探索出更为严谨清晰的prompt值得学习，同时，使用codex的习惯可参看原文进行培养。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>ai学习笔记</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>ai</tag>
+      
+      <tag>CS146S</tag>
+      
+      <tag>prompt</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>《英伟达之道》</title>
     <link href="/2025/12/29/%E8%AF%BB%E3%80%8A%E8%8B%B1%E4%BC%9F%E8%BE%BE%E4%B9%8B%E9%81%93%E3%80%8B/"/>
     <url>/2025/12/29/%E8%AF%BB%E3%80%8A%E8%8B%B1%E4%BC%9F%E8%BE%BE%E4%B9%8B%E9%81%93%E3%80%8B/</url>
     
-    <content type="html"><![CDATA[<p>在看这本书时，我同时看了《黑天鹅》（讲述人类本能忽视沉默的证据，习惯事后总结，这是一种经验错误。）、《灰犀牛》（风险）两本书，《英伟达之道》就是很传统的企业传记，描述公司的成立、发展、岌岌可危与稳步向前等等。其实每个卓越的企业，都有不凡的故事。我看的是英伟达的企业文化以及它的CEO黄仁勋的领导风格。</p>]]></content>
+    <content type="html"><![CDATA[<p>在看这本书时，我同时看了《黑天鹅》（讲述人类本能忽视沉默的证据，习惯事后总结，过于刻意讨论因果，这是一种经验性错误。）、《灰犀牛》（风险）两本书，《英伟达之道》就是很传统的企业传记，描述公司的成立、发展、岌岌可危与稳步向前等等。其实每个卓越的企业，都有不凡的故事。我看的是英伟达的企业文化以及它的CEO黄仁勋的领导风格。</p><ul><li>黄仁勋对任何工作量不如自己的人都缺乏同情心，他也不认为自己因为全心投入英伟达而错过了生活中的任何东西。对于自己的完美主义，他没有反驳，并表示同意。<br>“本该如此。如果你想做非凡的事情，那就不会轻松。”</li><li>黄仁勋工程背景的最纯粹体现是他看似无限的工作精力。在他看来，在商业中，职业道德比智力更重要。“你有多聪明并不重要，因为总会有人比你更聪明。”在一个全球化的世界，“你的竞争对手不会睡觉。”</li><li>“没有什么事情会被搁置。也没有什么事情会继续恶化。你必须做出回应，并推动这些事情向前发展。”人力资源前主管约翰麦克所里说道。</li><li>表扬有时候是一种干扰，最致命的错误就是回顾过去的成就，仿佛它们能保护你免受未来的威胁。<br>(ps ： 这句话，其实结合我的2025一年的经历，是非常有感悟的。 有时候，通过过去的阶段性胜利来幻想未来自己也能一如既往的顺利，从而放弃奔跑，是一种近乎自杀的行为。不要分不清自信与自负的区别。)</li><li>GPU横空出世：英伟达营销团队不顾工程师的反对，坚持使用GPU这一名称。“我们不需要任何人批准。”维沃利认为，行业外没人真的关心技术定义。此外，“我们知道下一代产品将是可编程的。我们决定冒险，将其夸大为GPU。”同时，维沃利决定不注册“GPU”商标，因为他希望其它公司也能用这个术语，意在表明英伟达开创了一个全新的产品类别。最终，”夸大”变为现实：GPU这一名称后来成为行业标准，并帮助英伟达在接下来的几十年里销售了数亿张显卡。<br>维达利对GPU的发布还提出了另一个想法：主动威慑竞争对手。英伟达的一名销售人员在一条通往3dfx总部的高速路的立交桥上设立了一个广告横幅，以宣传GeForce 256。该横幅宣称，英伟达的GPU将改变世界并击垮竞争对手。洲警迅速移除了这个非法设立的横幅，英伟达也因此收到了正式警告。但，这一举动确实达到了目的。”这就是战争的艺术。我们想让他们失去士气。”维达利说。英伟达正在逐步学习如何让对手屈服于自己的意志。</li><li>黄仁勋的原则之一：就是要赢。我们的理念是，谁能跑得更快，谁就能占领更多的市场。</li><li></li></ul>]]></content>
     
     
     <categories>
